@@ -14,7 +14,7 @@
 
 <c:if test="${loginUser == null}"> <!-- 로그인 되지 않은 경우 -->
 	<a href='${pageContext.request.contextPath}/member/login.do'><button type='button'> 로그인 </button></a>
-	<a href='${pageContext.request.contextPath}/member/add2.do'><button type='button'> 회원추가 </button></a>
+	<a href='${pageContext.request.contextPath}/member/add.do'><button type='button'> 회원추가 </button></a>
 </c:if>
 
 <hr>

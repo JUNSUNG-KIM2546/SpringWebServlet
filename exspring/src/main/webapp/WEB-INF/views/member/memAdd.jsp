@@ -13,7 +13,7 @@
 <jsp:include page="/WEB-INF/views/menu.jsp" />
 
 <h1>회원추가</h1>
-<form action='${pageContext.request.contextPath}/member/add2.do' method='post'>
+<form action='${pageContext.request.contextPath}/member/add.do' method='post'>
 		아이디 : 	 <input type='text' name='memId' value=''><br>
 		비밀번호 : <input type='password' name='memPass' value='' /><br>
 		이름 : 	 <input type='text' name='memName' value='' /><br>
@@ -22,7 +22,7 @@
 </form>
 	<h2>=================================================================</h2> 
 	<h2>회원목록으로 가기</h2>
-<a href='${pageContext.request.contextPath}/member/list2.do' method='post'>
+<a href='${pageContext.request.contextPath}/member/list.do' method='post'>
 		<button type='button'> 회원 목록 </button>
 </a>
 </body>

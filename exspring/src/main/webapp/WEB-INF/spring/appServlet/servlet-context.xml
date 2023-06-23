@@ -3,7 +3,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
@@ -29,34 +31,40 @@
 	
   	<!-- 스프링의 트랜잭션 관리를 담당할 객체 등록 -->
 	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-	  <beans:property name="dataSource" ref="dataSource" />
+	  <beans:property name="dataSource" ref="ds" />
 	</beans:bean>
 	
   <!-- 데이터베이스 접속 정보 설정 -->
-	<beans:bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-		<beans:property name="driverClassName" value="oracle.jdbc.OracleDriver" />
-		<beans:property name="url" value="jdbc:oracle:thin:@localhost:1521:xe" />
-		<beans:property name="username" value="WEB" />
-		<beans:property name="password" value="WEB01" />
+	<beans:bean id="ds" class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
+		<beans:property name="driverClassName" 	value="oracle.jdbc.OracleDriver" />
+		<beans:property name="url" 				value="jdbc:oracle:thin:@localhost:1521:xe" />
+		<beans:property name="username" 		value="WEB" />
+		<beans:property name="password" 		value="WEB01" />
 	</beans:bean>
 	
   <!-- 마이바티스 설정 -->
 	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-	  	<beans:property name="dataSource" ref="dataSource" />
+	  	<beans:property name="dataSource" ref="ds" />
 			<!-- 1.3.0 버전부터 XML 설정 파일 대신 직접 지정 가능 -->
-			<!-- <beans:property name="configuration"> -->
-		  <!--   <beans:bean class="org.apache.ibatis.session.Configuration"> -->
-		  <!--     <beans:property name="mapUnderscoreToCamelCase" value="true"/> -->
-		  <!--   </beans:bean> -->
-		  <!-- </beans:property> -->
+<!-- 			 <beans:property name="configuration">
+		     <beans:bean class="org.apache.ibatis.session.Configuration">
+		       <beans:property name="mapUnderscoreToCamelCase" value="true"/>
+		     </beans:bean>
+		   </beans:property>
+		   <beans:property name="typeAliasesPackage" value="com.exam.myapp"/> -->
 		  <!-- 마이바티스 전체 설정 파일 위치 -->
-		  <beans:property name="configLocation" value="classpath:batis/mybatis-config.xml" />
- 			<!-- 마이바티스가 실행할 SQL문들을 담고 있는 매퍼 XML 파일들을 등록 -->
+		<beans:property name="configLocation" value="classpath:batis/mybatis-config.xml" />
+ 		<!-- 마이바티스가 실행할 SQL문들을 담고 있는 매퍼 XML 파일들을 등록 -->
 	  	<beans:property name="mapperLocations" value="classpath*:batis/mappers/**/*.xml" />
 	</beans:bean>
 	
-  <!-- com.exam.myapp 패키지 하위에 있는 @Mapper가 붙어있는 인터페이스의 구현체를 자동 생성 및 등록 -->
-<!-- 	<mybatis-spring:scan base-package="com.exam.myapp" annotation="org.apache.ibatis.annotations.Mapper"/> -->
+<!-- 	<beans:bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+  		<beans:constructor-arg index="0" ref="sqlSessionFactory" />
+	</beans:bean> -->
+	
+	
+  	<!-- com.exam.myapp 패키지 하위에 있는 @Mapper가 붙어있는 인터페이스의 구현체를 자동 생성 및 등록 -->
+	<mybatis-spring:scan base-package="com.exam.myapp" annotation="org.apache.ibatis.annotations.Mapper"/>
 	
 	
 </beans:beans>
