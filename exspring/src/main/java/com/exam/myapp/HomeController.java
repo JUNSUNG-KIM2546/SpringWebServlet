@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class HomeController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	
+																//"com.exam.myapp.HomeController"										
 	// "/"  경로로 GET 방식 요청이 오면 실행
 	@RequestMapping(value = "/", method = RequestMethod.GET) 
 	public String home(Locale locale, Model model, Map map, ModelMap modelmap) {
