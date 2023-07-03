@@ -1,12 +1,17 @@
 package com.exam.myapp.bbs;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +50,8 @@ public class BbsController {
 	@PostMapping("add.do")	//@RequestMapping(path = "add.do", method = RequestMethod.POST)
 	public String add(BbsVo vo, HttpSession session, @SessionAttribute("loginUser") MemberVo mvo) {
 		
+		//System.out.println("첨부파일명 : " + vo.getBbsFile().getOriginalFilename());
+		
 		//MemberVo mvo = (MemberVo) session.getAttribute("loginUser"); //세션에 로그인 저장
 		vo.setBbsWriter(mvo.getMemId());	//로그인한 사용자아이디를 게시글 작성자로 설정
 		
@@ -78,14 +85,32 @@ public class BbsController {
 	
 	//게시글 삭제
 	@GetMapping("del.do")	//@RequestMapping(path = "del.do", method = RequestMethod.GET)
-	public String del(int bbsNo) {
-//		req.setCharacterEncoding("UTF-8");
+	public String del(int bbsNo) {		
 		
 		int n = bbsService.deleteBbs(bbsNo);	//클래스 참조하라
 		System.out.println( n + "개의 게시글 삭제");
 		
 		// 삭제 후 바로 리스트 창으로 가라
 		return "redirect:/bbs/list.do";	
+	}
+	
+	//컨트롤러 메서드가 인자로 HttpServletResponse, OutputStream, Writer를 받고 반환타입이 void 이면, 직접 응답을 처리(전송)했다고 판단하여 스프링은 뷰에 대한 처리를 하지 않는다.
+	@GetMapping("down.do")
+	public void download(int attNo, AttachVo vo, HttpServletResponse resp) {
+		
+		vo = bbsService.selectAttach(attNo);	//클래스 참조하라
+		
+		File f = bbsService.getAttachFile(vo);
+		
+		try {
+			//파일 f의 내용을 응답 객체(출력 스트림)에 복사(전송)	//파일이 저장된 폴더에 파일이 없으면 예외처리한다.
+			FileCopyUtils.copy( new FileInputStream(f), resp.getOutputStream() );
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		System.out.println( f + "개의 첨부파일 다운로드");
+		//다음 시간에 파일 확장자명, 원래이름으로 저장
 	}
 	
 }

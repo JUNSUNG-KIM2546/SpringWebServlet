@@ -1,5 +1,6 @@
 package com.exam.myapp.bbs;
 
+import java.io.File;
 import java.util.List;
 
 public interface BbsService {
@@ -18,5 +19,10 @@ public interface BbsService {
 	
 	// 게시글 수정(게시글 불러오기)
 	BbsVo selectBbs(int bbsNo);
+
+	// 첨부파일 다운로드
+	AttachVo selectAttach(int attNo);
+
+	File getAttachFile(AttachVo vo);
 
 }

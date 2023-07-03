@@ -4,10 +4,12 @@
 	xmlns:beans="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:mybatis-spring="http://mybatis.org/schema/mybatis-spring"
+	xmlns:tx="http://www.springframework.org/schema/tx"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://mybatis.org/schema/mybatis-spring http://mybatis.org/schema/mybatis-spring-1.2.xsd
 		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 
 	<!-- DispatcherServlet Context: defines this servlet's request-processing infrastructure -->
 	
@@ -27,6 +29,11 @@
 	<!-- com.exam.myapp 패키지의 하위에 있는 @Component, @Controller, @Service, @Repository, @Configuration 등이 적용된 클래드들을 스프링(객체 컨테이너)에 등록 -->
 	<context:component-scan base-package="com.exam.myapp" />
 	
+	<!-- 파일이 포함된 멀티파트 form 데이터를 해석할 수 있도록 CommonsMultipartResolver 또는 StandardServletMultipartResolver를 'multipartResolver'라는 이름으로 스프링에 등록 -->
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		
+	</beans:bean>
+	
 	<!-- 핸들러인터셉터 등록 -->
 	<interceptors>
 		<interceptor>
@@ -41,6 +48,13 @@
 	</interceptors>
 	
 	<!-- 데이터베이스 입출력을 위한 객체들을 등록하는 부분 -->
+	
+	<!-- 스프링의 트랜잭션 설정 방식 -->
+	<!-- -자바코드에 @Transactional 애노테이션을 사용 -->
+	<!-- -스프링 설정파일에 <tx:advice> 엘리먼트 사용 -->
+	
+	<!-- @Transactional을 이용한 트랜잭션 처리에 필요한 객체들을 자동 등록 -->
+	<tx:annotation-driven/>
 	
   	<!-- 스프링의 트랜잭션 관리를 담당할 객체 등록 -->
 	<beans:bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">

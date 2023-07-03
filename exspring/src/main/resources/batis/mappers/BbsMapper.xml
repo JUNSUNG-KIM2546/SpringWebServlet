@@ -7,13 +7,22 @@
 <mapper namespace="com.exam.myapp.bbs.BbsDao">
 
 	<!-- resultMap을 사용하여 초회결과의 어떤 컬럼값을 BbsVo 객체의 어떤 속성(변수)에 담을지(저장) 설정 -->
-	<resultMap type="MemberVo" id="MemberMap">
+	<resultMap type="BbsVo" id="BbsMap">
 		<!-- 기본키(PK)에 해당되는 컬럼에 대해서는 result 대신 ip 태그 사용 -->
-		<id property="memId" column="mem_Id" />
-		<result property="memPass" 	column="mem_Pass" />
-		<result property="memName" 	column="mem_Name" />
-		<result property="memPoint" column="mem_Point" />
-
+		<id property="bbsNo" column="bbs_no" />
+		<result property="bbsTitle" column="bbs_title" />
+		<result property="bbsContent" column="bbs_content" />
+		<result property="bbsWriter" column="bbs_writer" />
+		<result property="bbsRegDate" column="bbs_reg_date" />
+		<result property="bbsCount" column="bbs_count" />
+		<!-- JOIN 조회결과를 담기 위한 resultMap 설정 : 1:1 관계이면 association 엘리먼트를, 1:N 관계이면 collection 엘리먼트를 사용 -->
+		<collection property="attachList" ofType="AttachVo">
+			<id property="attNo" column="att_no" />
+			<result property="attOrgName" column="att_org_name" />
+			<result property="attNewName" column="att_new_name" />
+			<result property="attBbsNo" column="att_bbs_no" />
+		</collection>
+				
 	</resultMap>
 	<!-- 등록할 SQL문과 동일한 이름의 태그를 사용하여 SQL을 등록 -->
 	<!-- 이 파일 내에서 해당 SQL문의 고유한 이름을 id 속성값으로 설정 -->
@@ -28,11 +37,11 @@
   </select>
   
   	<!-- 게시글 상세 -->
-	<select id="selectBbs" resultType="BbsVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
+	<select id="selectBbs" resultMap="BbsMap">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
 	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
 	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
-    SELECT bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
-	FROM bbs
+    SELECT B.bbs_no, B.bbs_title, B.bbs_content, B.bbs_writer, B.bbs_reg_date, B.bbs_count, A.att_no, A.att_org_name, A.att_new_name, att_bbs_no
+	FROM bbs B LEFT OUTER JOIN attach A ON (B.bbs_no = A.att_bbs_no)
 	WHERE bbs_no = #{bbsNo}
   </select>
   
@@ -41,8 +50,11 @@
   &{속성명} : 문자열 이어붙이기 방식으로 동작 (보안상 위험하므로 가급적 사용자제) -->
   <!-- 게시판 등록 -->
   <insert id="insertBbs" > <!-- 파라미터 타입은 생략 해도됨-->
+  	<selectKey keyProperty="bbsNo" resultType="int" order="BEFORE"> <!-- 시퀀스값을 먼저 구함 -->
+  		SELECT bbs_seq.NEXTVAL  FROM dual	--시퀀스의 다음값(조회 할떄마다 1++한다)
+  	</selectKey>
   	INSERT INTO bbs ( bbs_no, bbs_title, bbs_content, bbs_writer )
-	VALUES ( bbs_seq.NEXTVAL, #{bbsTitle}, #{bbsContent}, #{bbsWriter} )
+	VALUES ( #{bbsNo}, #{bbsTitle}, #{bbsContent}, #{bbsWriter} )
   </insert>
 <!-- SQL문 실행시 전달받는 데이터의 타입을 parameterType 속성에 지정 가능(생략 가능) -->
 <!-- 문자열, 정수 등 단일값을 갖는 데이터를 파라미터(인자)로 받은 경우, #{속성명} 의 속성명에는 어떤 이름을 써도 무방 -->
