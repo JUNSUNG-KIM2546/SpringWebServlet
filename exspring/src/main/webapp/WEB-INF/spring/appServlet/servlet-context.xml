@@ -31,7 +31,8 @@
 	
 	<!-- 파일이 포함된 멀티파트 form 데이터를 해석할 수 있도록 CommonsMultipartResolver 또는 StandardServletMultipartResolver를 'multipartResolver'라는 이름으로 스프링에 등록 -->
 	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-		
+		<!-- 한 요청 당 최대 업로드(파일) 용량(바이트)을 설정 -1:기본값(무제한) -->
+		<beans:property name="maxUploadSize" value="-1"/>
 	</beans:bean>
 	
 	<!-- 핸들러인터셉터 등록 -->
@@ -46,6 +47,10 @@
 			<beans:bean class="com.exam.myapp.comm.LoginInterceptor" />
 		</interceptor>
 	</interceptors>
+	
+	<!-- location 속성에 지정한 프로퍼티 파일의 값을 읽어서 스프링 컨테이너에(프로퍼티 값으로) 등록 -->
+	<!-- 스프링 XML 설정파일 또는 @value 에서 ${프로퍼티키} 표현으로 프로퍼티값을 사용 가능 -->
+	<context:property-placeholder location="classpath:config/file.properties"/>
 	
 	<!-- 데이터베이스 입출력을 위한 객체들을 등록하는 부분 -->
 	

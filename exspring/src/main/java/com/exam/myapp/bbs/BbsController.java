@@ -1,14 +1,20 @@
 package com.exam.myapp.bbs;
 
+import java.awt.PageAttributes.MediaType;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
@@ -94,13 +100,35 @@ public class BbsController {
 		return "redirect:/bbs/list.do";	
 	}
 	
-	//컨트롤러 메서드가 인자로 HttpServletResponse, OutputStream, Writer를 받고 반환타입이 void 이면, 직접 응답을 처리(전송)했다고 판단하여 스프링은 뷰에 대한 처리를 하지 않는다.
+	//컨트롤러 메서드가 인자로 HttpServletResponse, OutputStream, Writer를 받고 반환타입이 void 이면, 
+	//직접 응답을 처리(전송)했다고 판단하여 스프링은 뷰에 대한 처리를 하지 않는다.
 	@GetMapping("down.do")
 	public void download(int attNo, AttachVo vo, HttpServletResponse resp) {
 		
-		vo = bbsService.selectAttach(attNo);	//클래스 참조하라
+		vo = bbsService.selectAttach(attNo);	//DB에서 다운로드할 첨부파일 정보
 		
-		File f = bbsService.getAttachFile(vo);
+		File f = bbsService.getAttachFile(vo);	//디스크 상에서 첨부파일의 위치 가져오기
+		
+		resp.setContentLength((int) f.length());	//응답메시지 본문(파일)의 크기 설정
+		//resp.setContentLengthLong(f.length());		//응답메시지 본문(파일)의 크기 설정
+		
+		resp.setContentType("application/octet-stream");
+		//resp.setContentType(MediaType.application_octet_stream_value);
+		
+		// 다룬로드 파일을 저장할 때 사용할 디폴트 파일명 설정
+		// 지원하는 브라우저에 따라서 다른 처리가 필요할 수도 있다.
+//		try {
+//			String fname = URLEncoder.encode(vo.getAttOrgName(), "UTF-8").replace("+", "%20");
+//			resp.setHeader("Content-Disposition", "attachment; filename*=UTF-8''" + fname);
+//			
+//			
+//		} catch (UnsupportedEncodingException e) {
+//			e.printStackTrace();
+//		}
+		
+		String cdv = ContentDisposition.attachment().filename(vo.getAttOrgName(), StandardCharsets.UTF_8).build().toString();
+		resp.setHeader(HttpHeaders.CONTENT_DISPOSITION, cdv);
+		
 		
 		try {
 			//파일 f의 내용을 응답 객체(출력 스트림)에 복사(전송)	//파일이 저장된 폴더에 파일이 없으면 예외처리한다.
@@ -109,7 +137,7 @@ public class BbsController {
 			e.printStackTrace();
 		}
 		
-		System.out.println( f + "개의 첨부파일 다운로드");
+		System.out.println( f + "의 첨부파일 다운로드");
 		//다음 시간에 파일 확장자명, 원래이름으로 저장
 	}
 	

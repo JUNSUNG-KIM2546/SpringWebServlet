@@ -10,18 +10,24 @@
 	<resultMap type="BbsVo" id="BbsMap">
 		<!-- 기본키(PK)에 해당되는 컬럼에 대해서는 result 대신 ip 태그 사용 -->
 		<id property="bbsNo" column="bbs_no" />
-		<result property="bbsTitle" column="bbs_title" />
-		<result property="bbsContent" column="bbs_content" />
-		<result property="bbsWriter" column="bbs_writer" />
-		<result property="bbsRegDate" column="bbs_reg_date" />
-		<result property="bbsCount" column="bbs_count" />
-		<!-- JOIN 조회결과를 담기 위한 resultMap 설정 : 1:1 관계이면 association 엘리먼트를, 1:N 관계이면 collection 엘리먼트를 사용 -->
-		<collection property="attachList" ofType="AttachVo">
-			<id property="attNo" column="att_no" />
-			<result property="attOrgName" column="att_org_name" />
-			<result property="attNewName" column="att_new_name" />
-			<result property="attBbsNo" column="att_bbs_no" />
-		</collection>
+		<result property="bbsTitle" 	column="bbs_title" />
+		<result property="bbsContent" 	column="bbs_content" />
+		<result property="bbsWriter" 	column="bbs_writer" />
+		<result property="bbsRegDate" 	column="bbs_reg_date" />
+		<result property="bbsCount" 	column="bbs_count" />
+		
+		<!-- JOIN 조회결과를 담기 위한 resultMap 설정 : 1:1 관계이면 association 엘리먼트를, 1:N 관계이면 collection 엘리먼트를 사용(게시물이 많을수록 좋음) -->
+		<!-- <collection property="attachList" ofType="AttachVo">
+			<id 	property="attNo" 		column="att_no" />
+			<result property="attOrgName" 	column="att_org_name" />
+			<result property="attNewName" 	column="att_new_name" />
+			<result property="attBbsNo" 	column="att_bbs_no" />
+		</collection> -->
+		
+		<!-- select로 다른 맵퍼에 있는 것을 가져올려면 네임스페이스까지 지정해줘야 한다, -->
+		<!-- bbs_no 컬럼값을 파라미터로 전달하면서 "com.exam.myapp.bbs.AttachDao.selectAttachList"인 SQL문을 실행하고, -->
+		<!-- 그 결과를 attachList 속성값으로 저장 -게시물이 몇개 없을 경우 좋음-  -->
+		<collection property="attachList" ofType="AttachVo" select="com.exam.myapp.bbs.AttachDao.selectAttachList" column="bbs_no" />
 				
 	</resultMap>
 	<!-- 등록할 SQL문과 동일한 이름의 태그를 사용하여 SQL을 등록 -->
@@ -31,18 +37,26 @@
 	<select id="selectBbsList" resultType="BbsVo">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
 	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
 	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
-    SELECT bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
-	FROM bbs
-	ORDER BY bbs_no DESC
+    SELECT 		bbs_no, bbs_title, bbs_writer, bbs_reg_date, bbs_count
+	FROM 		bbs
+	ORDER BY 	bbs_no DESC
   </select>
   
   	<!-- 게시글 상세 -->
 	<select id="selectBbs" resultMap="BbsMap">	<!-- 바티스셋팅(값 true) 해줘야 목록이 뜬다 -->
 	<!-- resultMap속성을 사용하여, id가 MemberMap인 resultMap에 써놓은대로 조회결과를 담도록 설정 -->
 	<!--   <select id="selectMemberList" resultMap="MemberMap"> --> <!-- 리설트맵을 불러와라 -->
-    SELECT B.bbs_no, B.bbs_title, B.bbs_content, B.bbs_writer, B.bbs_reg_date, B.bbs_count, A.att_no, A.att_org_name, A.att_new_name, att_bbs_no
-	FROM bbs B LEFT OUTER JOIN attach A ON (B.bbs_no = A.att_bbs_no)
-	WHERE bbs_no = #{bbsNo}
+	<!-- SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count, att_no, att_org_name, att_new_name, att_bbs_no
+	FROM 	(
+			  SELECT bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
+			  FROM	 bbs
+			  WHERE  bbs_no = #{bbsNo}
+			) 
+      		LEFT OUTER JOIN attach ON bbs_no = att_bbs_no;  - 게시물이 많을수록 좋음 - -->
+	
+	SELECT 	bbs_no, bbs_title, bbs_content, bbs_writer, bbs_reg_date, bbs_count
+	FROM	bbs
+	WHERE 	bbs_no = #{bbsNo}
   </select>
   
   <!--   파라미터(인자)로 받은 객체의 속성값들을 SQL문 내에 사용하기 위해서 #{속성명} 또는 &{속성명} 표현을 사용

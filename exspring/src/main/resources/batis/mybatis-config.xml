@@ -11,10 +11,12 @@
 <!-- 마이바티스 설정파일내에서 com.exam.member.MemberVo 를 MemberVo로 대신 사용 가능 -->
 <!-- 마이바티스 설정파일내에서 com.exam.myapp.bbs.BbsVo 를 BbsVo로 대신 사용 가능 -->
 <!-- 마이바티스 설정파일내에서 com.exam.myapp.bbs.AttachVo 를 attachVo로 대신 사용 가능 -->
+<!-- 마이바티스 설정파일내에서 com.exam.myapp.reply.ReplyVo 를 ReplyVo로 대신 사용 가능 -->
 	<typeAliases>
-		<typeAlias type="com.exam.myapp.member.MemberVo" alias="MemberVo"/>
-		<typeAlias type="com.exam.myapp.bbs.BbsVo" alias="BbsVo"/>
-		<typeAlias type="com.exam.myapp.bbs.AttachVo" alias="AttachVo"/>
+		<typeAlias type="com.exam.myapp.member.MemberVo" 	alias="MemberVo"/>
+		<typeAlias type="com.exam.myapp.bbs.BbsVo" 			alias="BbsVo"/>
+		<typeAlias type="com.exam.myapp.bbs.AttachVo" 		alias="AttachVo"/>
+		<typeAlias type="com.exam.myapp.reply.ReplyVo" 		alias="ReplyVo"/>
 		<!-- 패키지 태그를 사용하면, 지정한 패키지 하위의 모든 클래스들에 대한 별명을 자동 등록 -->
 		<!-- 별명은 패키지명을 제외한 심플클래스이름으로 걸정 -->
 		<!-- <package name="com.exam.member"/> -->

@@ -5,7 +5,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,11 +21,12 @@ public class BbsServiceImpl implements BbsService {
 	@Autowired
 	private AttachDao attachDao ;
 	
-	private String uploadPath = "C:/eGovFrame-4.0.0/Files";	//게시판 첨부파일 저장 위치
+	@Value("${bbs.upload.path}")	//지정한 값을 스프링이 변수에 주입(저장) @value를 써서 스프링이 스스로 프로퍼티키에 맞는 값을 주입(저장)
+	private String uploadPath;	//게시판 첨부파일 저장 위치
 	
 	
-	
-	public BbsServiceImpl() {
+	@PostConstruct	//스프링이 현재 객체의 초기화 작업이 완료된 후 실행
+	public void init() {
 		new File(uploadPath).mkdirs();	//uploadPath 디렉토리가 없으면 생성(파일을 저장할 등록한 폴더가 없으면 생성하고 저장하라)
 	}
 
@@ -33,7 +37,7 @@ public class BbsServiceImpl implements BbsService {
 	}
 
 	//게시글 추가 트랜잭션
-	@Transactional	// 이 메서드을 하나의 트랜잭션으로 정의
+	//@Transactional	// 이 메서드을 하나의 트랜잭션으로 정의
 	@Override
 	public int insertBbs(BbsVo vo) {
 		int num = bbsDao.insertBbs(vo);
@@ -46,9 +50,12 @@ public class BbsServiceImpl implements BbsService {
 			System.out.println( "파일명: " + f.getOriginalFilename() );
 			System.out.println( "파일크기: " + f.getSize() );
 			
-			String fname = UUID.randomUUID().toString();	//중복될 확률이 극도로 낮은 랜덤 문자열 생성
-			File saveFile = new File(uploadPath, fname);	//첨부파일 어떤 이름으로 저장할지(플러스나 ,로 하면 된다)
-			
+			String fname = null;	
+			File saveFile = null;	
+			do {	
+				fname = UUID.randomUUID().toString();	//중복될 확률이 극도로 낮은 랜덤 문자열 생성
+				saveFile = new File(uploadPath, fname);	//첨부파일 어떤 이름으로 저장할지(플러스나 ,로 하면 된다)
+			} while ( saveFile.exists() );	//중복되지 않은 명이 나올때까지 반복
 			
 			try {
 				f.transferTo(saveFile);	//파일 f의 내용을 saveFile에 복사(저장)
@@ -67,14 +74,20 @@ public class BbsServiceImpl implements BbsService {
 			}
 		}
 		
-		
 		return num;
 	}
 
 	//게시글 삭제
 	@Override
-	public int deleteBbs(int memId) {
-		return bbsDao.deleteBbs(memId);
+	public int deleteBbs(int bbsNo) {
+		//
+		BbsVo bbsVo = bbsDao.selectBbs(bbsNo);	//삭제할 게시글 정보 조회
+		for (AttachVo attVo : bbsVo.getAttachList() ) {	//게시글의 첨부파일을 하나씩 꺼내서
+			new File(uploadPath, attVo.getAttNewName()).delete();	//디스크에서 첨부파일 삭제
+			attachDao.deleteAttach(attVo.getAttNo());	//테이블에서 첨부파일 삭제
+		}
+		
+		return bbsDao.deleteBbs(bbsNo);
 	}
 
 	//게시글 수정
@@ -85,8 +98,8 @@ public class BbsServiceImpl implements BbsService {
 
 	//게시글 검색
 	@Override
-	public BbsVo selectBbs(int memId) {
-		return bbsDao.selectBbs(memId);
+	public BbsVo selectBbs(int bbsNo) {
+		return bbsDao.selectBbs(bbsNo);
 	}
 
 	// 첨부파일 불러오기

@@ -17,7 +17,7 @@ public interface AttachDao {
 	AttachVo selectAttach(int attNo);
 
 	// 첨부파일 삭제
-	//int deleteBbs(int memId);
+	int deleteAttach(int attNo);
 	
 	// 첨부파일 수정
 	//int updateBbs(BbsVo vo);
