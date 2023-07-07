@@ -8,7 +8,10 @@
 <html>
 <head>
 <meta charset='UTF-8'>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title> 게시판 목록 </title>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js" integrity="sha384-fbbOQedDUMZZ5KreZpsbe1LCZPVmfTnH7ois6mU1QK+m14rQ1l2bGBq41eYeM/fS" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -16,8 +19,8 @@
 
 <h1> 게시글 목록 </h1>
 
-<table>
-	<thead>
+<table border="1" class="table table-striped table-hover">
+	<thead class="table-dark">
 		<tr>
 			<th> 번호 </th>
 			<th> 제목 </th>
@@ -46,7 +49,7 @@
 	</tbody>
 </table>
 
-<a href="${pageContext.request.contextPath}/bbs/add.do"><button type='button'> 글쓰기 </button></a>
+<a href="${pageContext.request.contextPath}/bbs/add.do"><button type='button' class="btn btn-success"> 글쓰기 </button></a>
 	
 </body>
 </html>

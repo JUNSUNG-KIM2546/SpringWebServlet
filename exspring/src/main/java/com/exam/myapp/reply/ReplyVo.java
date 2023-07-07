@@ -1,12 +1,17 @@
 package com.exam.myapp.reply;
 
-import javax.xml.crypto.Data;
+import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 public class ReplyVo {
 	private int repNo;
 	private String repContent;
 	private String repWriter;
-	private Data repRegDate;
+	@JsonFormat
+    (shape = JsonFormat.Shape.STRING, pattern = "yyyy/MM/dd HH:mm:ss", timezone = "Asia/Seoul")
+	
+	private Date repRegDate;
 	private int repBbsNo;
 	
 	public int getRepNo() {
@@ -27,10 +32,10 @@ public class ReplyVo {
 	public void setRepWriter(String repWriter) {
 		this.repWriter = repWriter;
 	}
-	public Data getRepRegDate() {
+	public Date getRepRegDate() {
 		return repRegDate;
 	}
-	public void setRepRegDate(Data repRegDate) {
+	public void setRepRegDate(Date repRegDate) {
 		this.repRegDate = repRegDate;
 	}
 	public int getRepBbsNo() {
